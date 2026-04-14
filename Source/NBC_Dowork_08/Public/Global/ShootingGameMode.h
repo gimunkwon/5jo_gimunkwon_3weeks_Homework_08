@@ -8,4 +8,7 @@ UCLASS()
 class NBC_DOWORK_08_API AShootingGameMode : public AGameMode
 {
 	GENERATED_BODY()
+	
+public:
+	AShootingGameMode();
 };

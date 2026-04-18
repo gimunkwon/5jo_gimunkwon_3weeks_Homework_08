@@ -84,3 +84,6 @@ DerivedDataCache/*
 
 # Prerequisites
 *.d
+
+# Content
+Content/*

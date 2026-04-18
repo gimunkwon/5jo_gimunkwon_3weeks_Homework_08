@@ -26,4 +26,6 @@ public:
 	TObjectPtr<UInputAction> IA_Jump;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Input")
 	TObjectPtr<UInputAction> IA_Shoot;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Input")
+	TObjectPtr<UInputAction> IA_Zoom;
 };

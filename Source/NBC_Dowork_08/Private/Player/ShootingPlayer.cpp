@@ -3,7 +3,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "Player/Animations/ShootingPlayerAnimInst.h"
 #include "Player/Controller/ShootingPlayerControlloer.h"
+#include "Player/Weapon/PlayerWeapon.h"
 
 
 AShootingPlayer::AShootingPlayer()
@@ -24,6 +26,7 @@ AShootingPlayer::AShootingPlayer()
 void AShootingPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	EquipWeapon();
 }
 
 
@@ -46,6 +49,8 @@ void AShootingPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 			EnhancedInputComp->BindAction(PC->IA_Shoot,ETriggerEvent::Started,this, &AShootingPlayer::Shoot);
 			EnhancedInputComp->BindAction(PC->IA_Jump,ETriggerEvent::Started,this, &AShootingPlayer::StartJump);
 			EnhancedInputComp->BindAction(PC->IA_Jump,ETriggerEvent::Completed,this, &AShootingPlayer::EndJump);
+			EnhancedInputComp->BindAction(PC->IA_Zoom,ETriggerEvent::Started, this, &AShootingPlayer::StartZoom);
+			EnhancedInputComp->BindAction(PC->IA_Zoom,ETriggerEvent::Completed,this,&AShootingPlayer::EndZoom);
 		}
 	}
 	
@@ -95,4 +100,43 @@ void AShootingPlayer::EndJump()
 void AShootingPlayer::Shoot(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp,Warning,TEXT("Shoot"));
+}
+
+void AShootingPlayer::StartZoom()
+{
+	UE_LOG(LogTemp,Warning,TEXT("StartZoom"));
+	if (AM_Zoom)
+	{
+		if (UShootingPlayerAnimInst* MyAnimInst = Cast<UShootingPlayerAnimInst>(GetMesh()->GetAnimInstance()))
+		{
+			MyAnimInst->Montage_Play(AM_Zoom);
+			MyAnimInst->bSetbIszooming(true);
+		}
+	}
+}
+
+void AShootingPlayer::EndZoom()
+{
+	UE_LOG(LogTemp,Warning,TEXT("EndZoom"));
+	if (UShootingPlayerAnimInst* MyAnimInst = Cast<UShootingPlayerAnimInst>(GetMesh()->GetAnimInstance()))
+	{
+		MyAnimInst->bSetbIszooming(false);
+	}
+}
+
+void AShootingPlayer::EquipWeapon()
+{
+	if (WeaponClass)
+	{
+		AActor* NewWeapon = GetWorld()->SpawnActor<APlayerWeapon>(WeaponClass,FVector::ZeroVector,FRotator::ZeroRotator);
+		
+		if (NewWeapon)
+		{
+			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+			
+			NewWeapon->AttachToComponent(GetMesh(), AttachmentRules, TEXT("Weapon"));
+		}
+		
+	}
+	
 }

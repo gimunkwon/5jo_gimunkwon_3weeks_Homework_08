@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "ShootingPlayer.generated.h"
 
+struct FInputActionValue;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -20,6 +21,12 @@ protected:
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
+	
+	void Move(const FInputActionValue& value);
+	void Look(const FInputActionValue& value);
+	void StartJump(const FInputActionValue& value);
+	void EndJump();
+	void Shoot(const FInputActionValue& value);
 	
 public:
 	virtual void Tick(float DeltaTime) override;

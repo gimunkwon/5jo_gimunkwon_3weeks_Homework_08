@@ -10,6 +10,7 @@ void UShootingPlayerAnimInst::NativeInitializeAnimation()
 	{
 		MyOwnerPlayer = Cast<AShootingPlayer>(TryGetPawnOwner());
 	}
+	bIsZooming = false;
 }
 
 void UShootingPlayerAnimInst::NativeUpdateAnimation(float DeltaSeconds)
@@ -21,4 +22,9 @@ void UShootingPlayerAnimInst::NativeUpdateAnimation(float DeltaSeconds)
 		FVector Velocity = MyOwnerPlayer->GetVelocity();
 		Speed = Velocity.Size2D();
 	}
+}
+
+void UShootingPlayerAnimInst::bSetbIszooming(bool biszooming)
+{
+	bIsZooming = biszooming;
 }

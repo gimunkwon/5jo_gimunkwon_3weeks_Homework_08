@@ -15,9 +15,13 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
+	FORCEINLINE void bSetbIszooming(bool biszooming);
+	
 protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="PlayerInstance")
 	TObjectPtr<AShootingPlayer> MyOwnerPlayer;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Speed")
 	float Speed;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="CameraEffet")
+	bool bIsZooming;
 };

@@ -21,13 +21,23 @@ protected:
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="AnimMontage")
+	TObjectPtr<UAnimMontage> AM_Zoom;
+	
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Weapon")
+	TSubclassOf<AActor> WeaponClass;
 	
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
 	void StartJump(const FInputActionValue& value);
 	void EndJump();
 	void Shoot(const FInputActionValue& value);
+	void StartZoom();
+	void EndZoom();
 	
+	void EquipWeapon();
+
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

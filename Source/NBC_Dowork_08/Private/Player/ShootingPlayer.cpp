@@ -10,7 +10,7 @@ AShootingPlayer::AShootingPlayer()
 	
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->TargetArmLength = 400.f;
+	SpringArmComp->TargetArmLength = 0.f;
 	SpringArmComp->bUsePawnControlRotation = false;
 	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));

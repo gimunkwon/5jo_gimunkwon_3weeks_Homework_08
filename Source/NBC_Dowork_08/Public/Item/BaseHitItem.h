@@ -11,13 +11,9 @@ class UBaseHitItem : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
 class NBC_DOWORK_08_API IBaseHitItem
 {
 	GENERATED_BODY()
-
-	
 public:
+	virtual void HitItem() = 0;
 };

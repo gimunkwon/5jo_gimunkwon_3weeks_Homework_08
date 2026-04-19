@@ -4,8 +4,15 @@
 
 ABaseItem::ABaseItem()
 {
+	PrimaryActorTick.bCanEverTick = false;
 	
-	PrimaryActorTick.bCanEverTick = true;
+	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+	RootComponent = SceneComp;
+	
+	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	StaticMeshComp->SetupAttachment(SceneComp);
+	
+	Item_Score = 0;
 }
 
 
@@ -15,13 +22,9 @@ void ABaseItem::BeginPlay()
 	
 }
 
-
-void ABaseItem::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void ABaseItem::HitItem()
 {
+	UE_LOG(LogTemp,Warning,TEXT("Hit Item Success!!"))
+	Destroy();
 }
 

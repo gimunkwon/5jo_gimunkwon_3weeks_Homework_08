@@ -3,6 +3,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "Item/BaseItem.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/Animations/ShootingPlayerAnimInst.h"
 #include "Player/Controller/ShootingPlayerControlloer.h"
@@ -141,7 +142,11 @@ void AShootingPlayer::Shoot(const FInputActionValue& value)
 	
 	DrawDebugLine(GetWorld(),MuzzleLocation, bHit ? HitResult.ImpactPoint : TraceEnd, FColor::Green, false, 2.f, 0, 1.f);
 	
-	
+	if (bHit && HitResult.GetActor()->IsA(ABaseItem::StaticClass()))
+	{
+		ABaseItem* HittedItem = Cast<ABaseItem>(HitResult.GetActor());
+		HittedItem->HitItem();
+	}
 }
 
 void AShootingPlayer::StartZoom()

@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "ShootingPlayer.generated.h"
 
+class APlayerWeapon;
 struct FInputActionValue;
 class UCameraComponent;
 class USpringArmComponent;
@@ -17,8 +18,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Camera")
-	TObjectPtr<USpringArmComponent> SpringArmComp;
+	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Camera")
+	// TObjectPtr<USpringArmComponent> SpringArmComp;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="AnimMontage")
@@ -27,6 +28,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Weapon")
 	TSubclassOf<AActor> WeaponClass;
+	UPROPERTY()
+	TObjectPtr<APlayerWeapon> WeaponInstance;
+	
 	
 	void Move(const FInputActionValue& value);
 	void Look(const FInputActionValue& value);
@@ -37,7 +41,13 @@ protected:
 	void EndZoom();
 	
 	void EquipWeapon();
+	void MoveToGunView(float deltatime);
 
+private:
+	FVector OriginCamLocation;
+	FRotator OriginCamArmRotation;
+	bool bIsZooming;
+	
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

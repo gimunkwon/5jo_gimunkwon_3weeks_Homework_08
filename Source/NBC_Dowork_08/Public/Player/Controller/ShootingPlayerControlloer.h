@@ -28,4 +28,10 @@ public:
 	TObjectPtr<UInputAction> IA_Shoot;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Input")
 	TObjectPtr<UInputAction> IA_Zoom;
+	
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Widget")
+	TSubclassOf<UUserWidget> Widget_HUDClass;
+	UPROPERTY()
+	TObjectPtr<UUserWidget> Widget_HUDInstance;
 };

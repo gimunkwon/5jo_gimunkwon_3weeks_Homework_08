@@ -1,23 +1,21 @@
 #include "Player/Weapon/Weapon_Projectile.h"
 
-
-
 AWeapon_Projectile::AWeapon_Projectile()
 {
+	PrimaryActorTick.bCanEverTick = false;
 	
-	PrimaryActorTick.bCanEverTick = true;
+	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+	RootComponent = SceneComp;
+	
+	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	StaticMeshComp->SetupAttachment(SceneComp);
+	StaticMeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 
 void AWeapon_Projectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
-
-void AWeapon_Projectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 

@@ -134,6 +134,13 @@ void AShootingPlayer::Shoot(const FInputActionValue& value)
 	
 	DrawDebugLine(GetWorld(),CameraLocation, bHit ? HitResult.ImpactPoint : TraceEnd, FColor::Red, false, 2.f, 0, 1.f);
 	
+	FVector TargetPoint = bHit ? HitResult.ImpactPoint : TraceEnd;
+	
+	FVector MuzzleLocation = WeaponInstance->GetWeaponMesh()->GetSocketLocation(TEXT("MuzzleSocket"));
+	FRotator LaunchRotation = (TargetPoint - MuzzleLocation).Rotation();
+	
+	DrawDebugLine(GetWorld(),MuzzleLocation, bHit ? HitResult.ImpactPoint : TraceEnd, FColor::Green, false, 2.f, 0, 1.f);
+	
 	
 }
 

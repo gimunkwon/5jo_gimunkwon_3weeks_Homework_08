@@ -3,6 +3,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Player/Animations/ShootingPlayerAnimInst.h"
 #include "Player/Controller/ShootingPlayerControlloer.h"
 #include "Player/Weapon/PlayerWeapon.h"
@@ -10,22 +11,26 @@
 
 AShootingPlayer::AShootingPlayer()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	
-	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->TargetArmLength = 0.f;
-	SpringArmComp->bUsePawnControlRotation = true;
+	// SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	// SpringArmComp->SetupAttachment(RootComponent);
+	// SpringArmComp->TargetArmLength = 0.f;
+	// SpringArmComp->bUsePawnControlRotation = true;
 	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComp->SetupAttachment(SpringArmComp);
-	CameraComp->bUsePawnControlRotation = false;
+	CameraComp->SetupAttachment(RootComponent);
+	CameraComp->bUsePawnControlRotation = true;
+	
+	bIsZooming = false;
 }
 
 
 void AShootingPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	OriginCamLocation = CameraComp->GetRelativeLocation();
+	OriginCamArmRotation = CameraComp->GetRelativeRotation();
 	EquipWeapon();
 }
 
@@ -33,6 +38,8 @@ void AShootingPlayer::BeginPlay()
 void AShootingPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	MoveToGunView(DeltaTime);
 }
 
 
@@ -76,9 +83,17 @@ void AShootingPlayer::Look(const FInputActionValue& value)
 {
 	FVector2D RotateValue = value.Get<FVector2D>();
 	
+	FRotator NewRotatorX(RotateValue.X, 0.f, 0.f);
+	FRotator NewRotatorY(0.f,0.f,RotateValue.Y);
+	
 	if (!FMath::IsNearlyZero(RotateValue.X))
 	{
-		AddControllerPitchInput(RotateValue.X);
+		float NewPitch = GetActorRotation().Pitch + NewRotatorX.Pitch;
+		
+		if (NewPitch >= -89.f && NewPitch <= 89.f)
+		{
+			AddActorLocalRotation(NewRotatorX);
+		}
 	}
 	
 	if (!FMath::IsNearlyZero(RotateValue.Y))
@@ -107,21 +122,14 @@ void AShootingPlayer::StartZoom()
 	UE_LOG(LogTemp,Warning,TEXT("StartZoom"));
 	if (AM_Zoom)
 	{
-		if (UShootingPlayerAnimInst* MyAnimInst = Cast<UShootingPlayerAnimInst>(GetMesh()->GetAnimInstance()))
-		{
-			MyAnimInst->Montage_Play(AM_Zoom);
-			MyAnimInst->bSetbIszooming(true);
-		}
+		bIsZooming = true;
 	}
 }
 
 void AShootingPlayer::EndZoom()
 {
 	UE_LOG(LogTemp,Warning,TEXT("EndZoom"));
-	if (UShootingPlayerAnimInst* MyAnimInst = Cast<UShootingPlayerAnimInst>(GetMesh()->GetAnimInstance()))
-	{
-		MyAnimInst->bSetbIszooming(false);
-	}
+	bIsZooming = false;
 }
 
 void AShootingPlayer::EquipWeapon()
@@ -130,13 +138,41 @@ void AShootingPlayer::EquipWeapon()
 	{
 		AActor* NewWeapon = GetWorld()->SpawnActor<APlayerWeapon>(WeaponClass,FVector::ZeroVector,FRotator::ZeroRotator);
 		
+		WeaponInstance = Cast<APlayerWeapon>(NewWeapon);
+		
 		if (NewWeapon)
 		{
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-			
-			NewWeapon->AttachToComponent(GetMesh(), AttachmentRules, TEXT("Weapon"));
+			NewWeapon->AttachToComponent(GetMesh(), AttachmentRules, TEXT("WeaponSocket"));
 		}
 		
 	}
-	
+}
+
+void AShootingPlayer::MoveToGunView(float deltatime)
+{
+	if (bIsZooming && WeaponClass)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("MoveToGunViewON"));
+		FTransform SightTransform = WeaponInstance->GetWeaponMesh()->GetSocketTransform(TEXT("SightSocket"));
+		
+		DrawDebugCoordinateSystem(GetWorld(), SightTransform.GetLocation(), SightTransform.GetRotation().Rotator(),20.f);
+		
+		FVector TargetLocation = UKismetMathLibrary::InverseTransformLocation(GetRootComponent()->GetComponentTransform(), SightTransform.GetLocation());
+		FRotator TargetRotation = UKismetMathLibrary::InverseTransformRotation(GetRootComponent()->GetComponentTransform(), SightTransform.GetRotation().Rotator());
+		
+		FVector NewLocation = FMath::VInterpTo(CameraComp->GetRelativeLocation(), TargetLocation, deltatime, 10.f);
+		FRotator NewRotation = FMath::RInterpTo(CameraComp->GetRelativeRotation(), TargetRotation, deltatime, 10.f);
+		
+		CameraComp->SetRelativeLocation(NewLocation);
+		CameraComp->SetRelativeRotation(NewRotation);
+	}
+	else
+	{
+		FVector NewLocation = FMath::VInterpTo(CameraComp->GetRelativeLocation(), OriginCamLocation, deltatime, 10.f);
+		FRotator NewRotation = FMath::RInterpTo(CameraComp->GetRelativeRotation(), OriginCamArmRotation, deltatime, 10.f);
+		
+		CameraComp->SetRelativeLocation(NewLocation);
+		CameraComp->SetRelativeRotation(NewRotation);
+	}
 }

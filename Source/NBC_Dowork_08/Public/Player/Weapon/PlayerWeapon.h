@@ -11,6 +11,8 @@ class NBC_DOWORK_08_API APlayerWeapon : public AActor
 
 public:
 	APlayerWeapon();
+	FORCEINLINE UStaticMeshComponent* GetWeaponMesh() const{return MeshComp;}
+
 protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Mesh")

@@ -115,11 +115,31 @@ void AShootingPlayer::EndJump()
 void AShootingPlayer::Shoot(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp,Warning,TEXT("Shoot"));
+	
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(CameraLocation, CameraRotation);
+	
+	// CameraLocation.X += 100.f;
+	// CameraLocation.Y += 100.f;
+	CameraLocation.Z += 100.f;
+	
+	FVector TraceEnd = CameraLocation + (CameraRotation.Vector() * 10000.f);
+	
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult,CameraLocation,TraceEnd, ECC_Visibility,Params);
+	
+	DrawDebugLine(GetWorld(),CameraLocation, bHit ? HitResult.ImpactPoint : TraceEnd, FColor::Red, false, 2.f, 0, 1.f);
+	
+	
 }
 
 void AShootingPlayer::StartZoom()
 {
-	UE_LOG(LogTemp,Warning,TEXT("StartZoom"));
+	// UE_LOG(LogTemp,Warning,TEXT("StartZoom"));
 	if (AM_Zoom)
 	{
 		bIsZooming = true;
@@ -128,7 +148,7 @@ void AShootingPlayer::StartZoom()
 
 void AShootingPlayer::EndZoom()
 {
-	UE_LOG(LogTemp,Warning,TEXT("EndZoom"));
+	// UE_LOG(LogTemp,Warning,TEXT("EndZoom"));
 	bIsZooming = false;
 }
 
@@ -153,10 +173,10 @@ void AShootingPlayer::MoveToGunView(float deltatime)
 {
 	if (bIsZooming && WeaponClass)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("MoveToGunViewON"));
+		// UE_LOG(LogTemp,Warning,TEXT("MoveToGunViewON"));
 		FTransform SightTransform = WeaponInstance->GetWeaponMesh()->GetSocketTransform(TEXT("SightSocket"));
 		
-		DrawDebugCoordinateSystem(GetWorld(), SightTransform.GetLocation(), SightTransform.GetRotation().Rotator(),20.f);
+		// DrawDebugCoordinateSystem(GetWorld(), SightTransform.GetLocation(), SightTransform.GetRotation().Rotator(),20.f);
 		
 		FVector TargetLocation = UKismetMathLibrary::InverseTransformLocation(GetRootComponent()->GetComponentTransform(), SightTransform.GetLocation());
 		FRotator TargetRotation = UKismetMathLibrary::InverseTransformRotation(GetRootComponent()->GetComponentTransform(), SightTransform.GetRotation().Rotator());

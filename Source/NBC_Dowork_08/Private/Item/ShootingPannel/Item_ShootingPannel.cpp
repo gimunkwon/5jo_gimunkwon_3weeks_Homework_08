@@ -1,5 +1,6 @@
 #include "Item/ShootingPannel/Item_ShootingPannel.h"
 
+#include "Item/Projectile/Shooting_Projectile.h"
 
 
 AItem_ShootingPannel::AItem_ShootingPannel()
@@ -23,7 +24,6 @@ void AItem_ShootingPannel::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	RotateItem(DeltaSeconds);
 }
-
 
 void AItem_ShootingPannel::RotateItem(float DeltaTime)
 {
@@ -73,6 +73,28 @@ void AItem_ShootingPannel::FireToPlayer()
 	DrawDebugLine(GetWorld(), MuzzleLocation, EndLocation
 		, FColor::Yellow, false, 2.f, 0, 2.f);
 	
+	if (ProjectileClass)
+	{
+		// 오브젝트 풀링 리팩토링 예정
+		AActor* SpawnProjectile = GetWorld()->SpawnActor<AActor>(ProjectileClass,MuzzleLocation,GetActorRotation());
+		
+		if (SpawnProjectile)
+		{
+			FTimerHandle SpawnTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, [SpawnProjectile,this]()
+			{
+				float Velocity = GetWorld()->GetDeltaSeconds() * 200.f;
+				FVector AddLocation(Velocity,0.f,0.f);
+				SpawnProjectile->AddActorLocalOffset(AddLocation);
+				FTimerHandle DestroyTimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, [SpawnProjectile,this]()
+				{
+					if (SpawnProjectile) SpawnProjectile->Destroy();
+					
+				},3.f,false);
+			},0.01f, true);
+		}
+	}
 	
 }
 

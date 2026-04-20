@@ -16,6 +16,8 @@ protected:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Time")
 	float RotateTime;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Projectile")
+	TSubclassOf<AActor> ProjectileClass;
 	
 	FTimerHandle RotateTimerHandle;
 	

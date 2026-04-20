@@ -13,6 +13,21 @@ public:
 	AItem_ShootingPannel();
 protected:
 	virtual void BeginPlay() override;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Time")
+	float RotateTime;
+	
+	FTimerHandle RotateTimerHandle;
+	
+	void RotateItem(float DeltaTime);
+	void FireToPlayer();
+	
+private:
+	float RotateAngle;
+	bool bEndRotate;
+	float CurrentRotateValue;
 public:
 	virtual void HitItem() override;
+	virtual void Tick(float DeltaSeconds) override;
 };
+

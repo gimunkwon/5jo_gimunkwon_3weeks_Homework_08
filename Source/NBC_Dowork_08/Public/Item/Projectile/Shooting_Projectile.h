@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "Shooting_Projectile.generated.h"
 
+class UBoxComponent;
+
 UCLASS()
 class NBC_DOWORK_08_API AShooting_Projectile : public AActor
 {
@@ -13,6 +15,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-public:
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,UPrimitiveComponent* OtherComp
+		, int32 OtherBodyIndex,bool bFromSweep, const FHitResult& SweepResult);
+
+	
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Mesh")
+	TObjectPtr<USceneComponent> SceneComp;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Mesh")
+	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Collision")
+	TObjectPtr<UBoxComponent> BoxComp;
 };
